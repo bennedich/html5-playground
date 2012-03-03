@@ -1,3 +1,3 @@
 Web related experiments
 
-[test21_svgAnim.html](http://bennedich.github.com/Web-Playground/experiments/test21_svgAnim.html)
+[test21_svgAnim.html](http://bennedich.github.com/web-playground/experiments/test21_svgAnim.html)
