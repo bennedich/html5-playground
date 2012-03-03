@@ -1,0 +1,72 @@
+<style>
+svg {
+    border: 1px solid #ddd;
+    margin: 10px;
+    padding: 0;
+}
+</style>
+
+
+
+<svg
+    xmlns="http://www.w3.org/2000/svg" version="1.1"
+    width="400" height="400">
+    
+    <rect
+        x="-50" y="-50"
+        width="100" height="100"
+        transform="translate(200, 200) rotate(0)"/>
+</svg>
+
+
+
+<script>
+var RAD2DEG,
+    reqAnimFrame,
+    svg, rect,
+    keepLooping, posX, posY,
+    render, ctm, rot, dA, transform;
+
+RAD2DEG = 180 / Math.PI;
+
+
+reqAnimFrame = window.requestAnimationFrame    ||
+               window.webkitRequestAnimationFrame ||
+               window.mozRequestAnimationFrame ||
+               window.msRequestAnimationFrame ||
+               window.oRequestAnimationFrame;
+
+
+svg  = document.querySelector( 'svg' );
+rect = document.querySelector( 'rect' );
+
+
+keepLooping = true;
+posX = 100;
+posY = 100;
+
+render = function ( timestamp ) {
+  if ( keepLooping )
+    reqAnimFrame( render );
+  
+  ctm  = rect.getCTM();
+  rot  = Math.atan2( ctm.b, ctm.a ) * RAD2DEG;
+  rot -= 5;
+  
+  dA = ( timestamp / 10 ) % 360;
+  //posX = 200 + 100 * Math.cos( dA );
+  //posY = 200 + 100 * Math.sin( dA );
+  
+  transform = [
+    'translate(', 200, 200, ')',
+    'rotate(', dA, ')',
+    'translate(', 100, 100, ')',
+    'rotate(', rot - dA, ')'
+  ].join( ' ' );
+  
+  rect.setAttributeNS( null, 'transform', transform );
+};
+
+
+render( 0 );
+</script>
