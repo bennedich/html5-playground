@@ -1,4 +1,4 @@
-<link href="https://raw.github.com/bennedich/web-playground/master/markdown.css" rel="stylesheet"></link>
+<link href="http://bennedich.github.com/main.css" rel="stylesheet"></link>
 <h1>Web related experiments</h1>
 
 
@@ -16,4 +16,3 @@
 <p><a href="http://bennedich.github.com/web-playground/experiments/test38_webgl.html">WebGL 2d animation with gl_points</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test43_dragDrop_file2base64.html">File &raquo; base64 converter, drag & drop and dynamic line breaks</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test44_css3_notifications.html">CSS3 notifications</a></p>
-
