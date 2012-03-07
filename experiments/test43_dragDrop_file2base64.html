@@ -1,4 +1,15 @@
+<!--<link rel="stylesheet" href="http://bennedich.github.com/main.css"></link>-->
+<link rel="stylesheet" href="/bennedich.github.com/main.css"></link>
+
 <style>
+
+.paper {
+    top: 30px;
+    left: 50%;
+    bottom: 30px;
+    width: 960px;
+    margin-left: -480px;
+}
 
 .dropzone {
     -moz-box-sizing: border-box;
@@ -13,6 +24,12 @@
     
     color: #999;
     
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    
     -webkit-transition: all .1s ease;
     -moz-transition: all .1s ease;
     -ms-transition: all .1s ease;
@@ -20,19 +37,22 @@
     transition: all .1s ease;
 }
 
-.dropzone > h1 {
-    font: 900 50px/1 Arial;
-    text-align: center;
-    letter-spacing: -3px;
-    margin-top: 100px;
+.dropzone > * {
     pointer-events: none;
+    text-align: center;
+}
+
+.dropzone > h6 {
+}
+
+.dropzone > h1 {
+    margin-top: 60px;
 }
 
 .dropzone.selected {
     border-color: #444;
     color: #444;
 }
-
 
 .options, .options input {
     width: 250px;
@@ -44,57 +64,52 @@
 
 .options input {
     max-width: 40px;
+    background-color: transparent;
+    text-align: center;
 }
-
-
 
 #outputField {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     
-    width: 960px;
-    margin: 20px auto 50px;
-    padding: 10px 15px;
-    
-    border: 1px solid #999;
-    
-    overflow: auto;
-    
+    margin-top: 30px;
     font: 10px/1 'Courier New', courier, monospace;
     text-align: center;
     white-space: pre-wrap;
     word-wrap: break-word;
 }
 
-
 </style>
 
 
-<section id='dropzone' class='dropzone'>
-    <h1>file &raquo; base64</h1>
+
+<section class='paper'>
+    <div class='shadowWrapper'>
+        <section id='dropzone' class='dropzone'>
+            <h5>Drag&Drop</h5>
+            <h1>file &raquo; base64</h1>
+        </section>
+        <table class='options'>
+            <tbody>
+                <tr>
+                    <td>Line breaks/width</td>
+                    <td><input name='lbBool' type='checkbox'></td>
+                    <td><input name='lineWidth' value='78'></td>
+                </tr>
+                <tr>
+                    <td>Line break char</td>
+                    <td><input name='lbCharBool' type='checkbox'></td>
+                    <td><input name='lbChar' value='&#92;'></td>
+                </tr>
+                <tr>
+                    <td>Char count</td>
+                    <td colspan='2' name='charCount'>-</td>
+                </tr>
+            </tbody>
+        </table>
+        <section id='outputField'><p>Output</p></section>
+    </div>
 </section>
-
-<table class='options'>
-    <tbody>
-        <tr>
-            <td>Line breaks/width</td>
-            <td><input name='lbBool' type='checkbox'></td>
-            <td><input name='lineWidth' value='78'></td>
-        </tr>
-        <tr>
-            <td>Line break char</td>
-            <td><input name='lbCharBool' type='checkbox'></td>
-            <td><input name='lbChar' value='&#92;'></td>
-        </tr>
-        <tr>
-            <td>Char count</td>
-            <td colspan='2' name='charCount'>-</td>
-        </tr>
-    </tbody>
-</table>
-
-<section id='outputField'><p>Output</p></section>
-
 
 
 
@@ -194,14 +209,11 @@ readFile = function ( f ) {
 };
 
 
-
 fieldLbBool = document.querySelector('[name=lbBool]');
 fieldLineW = document.querySelector('[name=lineWidth]');
 fieldUseLbChar = document.querySelector('[name=lbCharBool]');
 fieldLbChar = document.querySelector('[name=lbChar]');
 fieldCharCount = document.querySelector('[name=charCount]');
-
-
 
 
 outputData = function ( data ) {
@@ -241,23 +253,12 @@ onOptionsChange = function ( evt ) {
 };
 
 
-
 fieldLbBool.addEventListener( 'change', onOptionsChange );
 fieldLineW.addEventListener( 'change', onOptionsChange );
 fieldUseLbChar.addEventListener( 'change', onOptionsChange );
 fieldLbChar.addEventListener( 'change', onOptionsChange );
 
 
-
-
 new Dropzone( '#dropzone', outputFile );
 
-
-
 </script>
-
-
-
-
-
-
