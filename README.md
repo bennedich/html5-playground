@@ -1,28 +1,4 @@
-<style>
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:700,300);
-body {
-  font-family: 'Open Sans';
-  font-size: 14px;
-}
-p {
-    margin: 3px 0;
-}
-a {
-    text-decoration: none;
-    color: #444;
-    -webkit-transition: margin .1s ease;
-    -moz-transition: margin .1s ease;
-    -ms-transition: margin .1s ease;
-    -o-transition: margin .1s ease;
-    transition: margin .1s ease;
-}
-a::before {
-    content: '» ';
-}
-a:hover {
-    margin-left: 5px;
-}
-</style>
+<link href="https://raw.github.com/bennedich/web-playground/master/markdown.css" rel="stylesheet"></link>
 
 <h1>Web related experiments</h1>
 
