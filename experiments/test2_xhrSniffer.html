@@ -1,0 +1,54 @@
+<h1>XMLHttpRequest Sniffer (see source)</h1>
+<pre></pre>
+
+
+
+<script>
+
+var pre = document.querySelector( 'pre' );
+
+
+
+( function() {
+  'use strict';
+  var oldXHR, stateChangeHandler, prop;
+  
+  oldXHR = window.XMLHttpRequest;
+  
+  stateChangeHandler = function ( evt ) {
+    switch ( this.readyState ) {
+      case oldXHR.OPENED:
+        pre.textContent += Date.now() + ' xhr request was made\n';
+        break;
+      case oldXHR.DONE:
+        pre.textContent += Date.now() + ' xhr request finished\n';
+        break;
+    }
+  };
+  
+  function newXHR () {
+    var xhr = new oldXHR();
+    xhr.addEventListener( 'readystatechange', stateChangeHandler );
+    return xhr;
+  }
+  
+  // Copy original states and toString
+  for ( prop in oldXHR )
+    newXHR[ prop ] = oldXHR[ prop ];
+  
+  window.XMLHttpRequest = newXHR;
+} )();
+
+</script>
+
+
+
+<script>
+
+// usage without knowledge of sniffer
+var xhr = new XMLHttpRequest;
+xhr.onreadystatechange = function ( evt ) { /* whatever */ };
+xhr.open( 'GET', location.href );
+xhr.send();
+
+</script>

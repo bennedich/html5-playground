@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+
+<style>
+
+body { font-family: 'Helvetica Neue', helvetica, arial, sans-serif }
+
+svg, canvas, .out {
+    border: 1px solid #ddd;
+    margin: 10px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>SVG &raquo; canvas &raquo; img</h1>
+<pre>Last step isnt yet working because of browser vendor implementation bug
+treating all svg content written to canvas as unsafe/foreign domain content.</pre>
+
+<!-- wrap svg for catching svg with innerHTML in JS -->
+<div>
+<svg
+    xmlns='http://www.w3.org/2000/svg' version='1.1'
+    width='200' height='200'>
+    <rect
+        x='-75' y='-50'
+        width='150' height='100'
+        fill='#900'
+        transform='translate(100,100) rotate(30)' />
+</svg>
+</div>
+
+<canvas width='200' height='200'></canvas>
+
+<div class='out'></div>
+
+<script>
+
+var svg, cvs, out, ctx, img, w, h, imgData;
+
+svg = document.querySelector( 'svg' );
+cvs = document.querySelector( 'canvas' );
+out = document.querySelector( '.out' );
+
+ctx = cvs.getContext( '2d' );
+
+img = new Image();
+img.src = 'data:image/svg+xml,' + svg.parentNode.innerHTML;
+img.addEventListener( 'load', function () {
+    w = svg.getAttributeNS( null, 'width' );
+    h = svg.getAttributeNS( null, 'height' );
+    
+    ctx.drawImage( img, 0, 0, w, h );
+    
+    try {
+        img = new Image();
+        img.src = cvs.toDataURL( 'image/png' );
+        out.appendChild( img );
+    } catch ( err ) {
+        out.textContent = err;
+    }
+} );
+
+</script>
+
+</body>
+</html>

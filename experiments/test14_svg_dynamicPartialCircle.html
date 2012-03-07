@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+
+<style>
+
+body { font-family: 'Helvetica Neue', helvetica, arial, sans-serif }
+
+svg {
+  border: 1px solid #ddd;
+  margin: 10px;
+  padding: 0;
+}
+
+</style>
+
+</head>
+<body>
+
+<h1>SVG Pie</h1>
+
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  width="400"
+  height="400">
+</svg>
+
+<script>
+
+var reqAnimFrame,
+    generatePie, setPie,
+    animate, NS, svg, pie;
+
+
+reqAnimFrame =
+   window.requestAnimationFrame ||
+   window.webkitRequestAnimationFrame ||
+   window.mozRequestAnimationFrame ||
+   window.msRequestAnimationFrame ||
+   window.oRequestAnimationFrame;
+
+
+generatePie = function ( cx, cy, r, deg, reverse ) {
+  var lx, ly, rx, ry, xAxisRot, arcFlag, sweepFlag, rad, x, y;
+  
+  reverse = reverse || 0;
+  
+  if ( deg >= 360 ) {
+    deg = 359.9999;
+    cy -= r;
+    lx  = 0;
+    ly  = 0;
+  }
+  
+  else {
+    lx = 0;
+    ly = -r;
+  }
+  
+  rx = ry   = r;
+  xAxisRot  = 0;
+  arcFlag   = deg > 180 ? 1 : 0;
+  sweepFlag = 1 - reverse;
+  rad       = deg / 180 * Math.PI;
+  x         = ( reverse ? -1 : 1 ) * Math.sin( rad ) * r;
+  y         = ( 1 - Math.cos( rad ) ) * r;
+  
+  return [ 'M', cx, cy,
+           'l', lx, ly,
+           'a', rx, ry, xAxisRot, arcFlag, sweepFlag, x, y,
+           'z' ].join( ' ' );
+};
+
+
+setPie = function ( pie, cx, cy, r, deg, reverse ) {
+  var d = generatePie( cx, cy, r, deg, reverse );
+  pie.setAttributeNS( null, 'd', d );
+};
+
+
+animate = function ( pie, ms ) {
+  var deg, delta, _animate;
+  deg     = .1;
+  delta   = 360 / ( .06 * ms );
+  reverse = false;
+  
+  _animate = function () {
+    reqAnimFrame( _animate );
+    if ( deg <= 0 || deg >= 360 ) {
+      delta = -delta;
+      reverse = !reverse;
+    }
+    setPie( pie, 0, 0, 200, deg+=delta, reverse );
+  };
+  
+  _animate();
+};
+
+
+NS = {
+  'null' : null,
+  svg    : 'http://www.w3.org/2000/svg'
+};
+
+
+svg = document.querySelector( 'svg' );
+pie = document.createElementNS( NS.svg, 'path' );
+pie.setAttributeNS( NS.null, 'fill', 'rgb(0,153,255)' );
+pie.setAttributeNS( NS.null, 'stroke', 'rgb(221,255,100)' );
+pie.setAttributeNS( NS.null, 'stroke-width', 3 );
+pie.setAttributeNS( NS.null, 'transform', 'translate(200,200) rotate(270)' );
+svg.appendChild( pie );
+
+
+animate( pie, 2000 );
+
+</script>
+
+</body>
+</html>

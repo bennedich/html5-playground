@@ -1,0 +1,137 @@
+<style>
+
+body {
+    font-family: 'Helvetica Neue', helvetica, arial, sans-serif;
+}
+
+svg {
+    border: 1px solid #ddd;
+    margin: 10px;
+    padding: 0;
+}
+
+button { font-size: 14px }
+tr { font-weight: 700 }
+td { width: 40px }
+td:last-child { text-align: right }
+.rot  { color: #900 }
+.atan { color: #090 }
+
+</style>
+
+<h1>SVG: Get rotation from CTM</h1>
+
+
+<button class='start'>Start</button>
+<button class='stop'>Stop</button>
+
+
+<table>
+    <tr class='asin'><td>asin</td><td>-</td></tr>
+    <tr class='acos'><td>acos</td><td>-</td></tr>
+    <tr class='rot'><td>rot</td><td>-</td></tr>
+    <tr class='atan'><td>atan</td><td>-</td></tr>
+</table>
+
+
+<svg
+    xmlns="http://www.w3.org/2000/svg" version="1.1"
+    width="300" height="300">
+
+    <g
+        transform="translate( 150, 150 )">
+        <rect
+            x="-50" y="-50"
+            width="100" height="100"
+            transform="rotate( 0 )" />
+    </g>
+</svg>
+
+
+<script>
+var RAD2DEG,
+    reqAnimFrame,
+    svg, g, r,
+    getRotation,
+    rotation, ctm,
+    keepLooping, start, stop, loop;
+
+RAD2DEG = 180 / Math.PI;
+
+
+reqAnimFrame =
+    window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    window.oRequestAnimationFrame;
+
+
+svg = document.querySelector( 'svg' );
+g = document.querySelector( 'g' );
+r = document.querySelector( 'rect' );
+
+asin = document.querySelector( '.asin > td:last-child' );
+acos = document.querySelector( '.acos > td:last-child' );
+rot  = document.querySelector( '.rot > td:last-child' );
+atan = document.querySelector( '.atan > td:last-child' );
+
+
+getRotation = function ( dx, dy ) {
+    var r = Math.atan2( dy, dx ) * 180 / Math.PI;
+    return ( r > 180 )  ? r-360 :
+        ( r < -180 ) ? r+360 :
+        r;
+}
+
+
+keepLooping = false;
+
+
+start = function () {
+    if ( keepLooping )
+        return false;
+    keepLooping = true;
+    loop();
+    return true;
+};
+
+
+stop = function () {
+    keepLooping = false;
+};
+
+
+rotation = 0;
+
+
+loop = function () {
+    rotation += .5;
+    r.setAttributeNS( null, 'transform', 'rotate('+ rotation +')' );
+
+    ctm = r.getCTM();
+    
+    // manual calculation of current rotation
+    _acos = Math.acos( ctm.a );
+    _asin = Math.asin( ctm.b );
+
+    asin.textContent = Math.floor( RAD2DEG * _asin );
+    acos.textContent = Math.floor( RAD2DEG * _acos );
+    rot.textContent  = Math.floor( RAD2DEG * _acos * _asin / Math.abs( _asin ) );
+    
+    // built-in calculation of current rotation
+    atan.textContent = Math.floor( RAD2DEG * Math.atan2( ctm.b, ctm.a ) );
+
+    if ( keepLooping )
+        reqAnimFrame( loop );
+};
+
+
+document.querySelector( 'button.start' ).addEventListener( 'click', start );
+document.querySelector( 'button.stop' ).addEventListener( 'click', stop );
+
+
+</script>
+
+</body>
+</html>

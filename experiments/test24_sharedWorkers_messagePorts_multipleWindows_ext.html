@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+</head>
+<body>
+    <input name="sendMessage" tabindex="1" placeholder="Type message"/>
+    <pre id="output"></pre>
+
+<script>
+var ports,
+    sendInput, sendMessage, out,
+    output, manageWorker, inputSendMessage;
+
+ports = [];
+
+
+sendInput = function ( e ) {
+    if ( e.keyCode !== 13 )
+        return;
+    sendMessage( inputSendMessage.value );
+    inputSendMessage.value = '';
+    inputSendMessage.focus();
+};
+
+
+sendMessage = function ( msg ) {
+    var i, ii, port;
+    
+    // write to all ports in ports array
+    for ( i=0, ii=ports.length ; i<ii ; i++ ) {
+        port = ports[ i ];
+        if ( port )
+            port.postMessage( msg );
+    }
+    
+    if ( window.opener )
+        window.opener.postMessage( msg, '*' ); // '*' or trusted origin
+};
+
+
+out = function ( msg ) {
+    output.textContent += msg + '\n';
+};
+
+
+
+manageWorker = function ( e ) {
+    out( 'From worker: '+ e.data );
+};
+
+
+window.onmessage = function ( e ) {
+    var i, port;
+    
+    console.log( e.ports );
+    
+    // add received ports to ports array
+    if ( e.ports.length ) {
+        port = e.ports[ 0 ];
+        port.onmessage = manageWorker;
+        ports.push( port );
+        out( 'Worker port received from main' );
+        
+        sendMessage( 'Hello from ext window!' );
+    }
+    
+    else {
+        out( 'From main window: '+ e.data );
+        sendMessage( 'You said '+ e.data );
+    }
+};
+
+
+output = document.querySelector( '#output' );
+inputSendMessage = document.querySelector( '[name=sendMessage]' );
+inputSendMessage.onkeydown = sendInput;
+sendMessage( 'I\'m alive!' );
+
+</script>
+
+</body>
+</html>

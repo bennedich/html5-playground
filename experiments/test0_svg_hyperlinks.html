@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+
+<!--
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src='jquery.svg.js'></script>
+-->
+
+<style>
+
+embed, svg {
+  border: 1px solid #ddd;
+  margin: 5px;
+  padding: 5px;
+}
+
+button.createA {
+    display: block;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+</style>
+
+</head>
+<body>
+
+<embed src="circle1.svg" type="image/svg+xml">
+
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="100"
+  height="100">
+</svg>
+
+
+<button class='createA'>Create SVG &#60;a&#62; element</button>
+
+
+<script>
+
+(function (scope) {
+  'use strict';
+  var onSvgLoaded, embeds, embed, i;
+  
+  
+  scope.NS = {
+    "null": null,
+    plato: 'plato',
+    html: 'http://www.w3.org/1999/xhtml',
+    xlink: 'http://www.w3.org/1999/xlink',
+    svg: 'http://www.w3.org/2000/svg',
+    xmlns: 'http://www.w3.org/2000/xmlns',
+    ev: 'http://www.w3.org/2001/xml-events'
+  };
+  
+  
+  scope.emb = document.querySelector('embed');
+  scope.svg = document.querySelector('svg');
+  
+  emb.addEventListener('load', function () {
+    scope.cir = scope.emb.getSVGDocument().documentElement.querySelector('circle');
+  });
+  
+  scope.frag = document.createDocumentFragment();
+  
+  scope.createA = function () {
+    var a, t, s;
+    a = document.createElementNS(NS.svg, 'a');
+    a.setAttributeNS(NS.xlink, 'xlink:href', location.href);
+    a.setAttributeNS(NS.null, 'target', '_blank');
+    
+    t = document.createElementNS(NS.svg, 'text');
+    t.setAttributeNS(NS.null, 'x', 5);
+    t.setAttributeNS(NS.null, 'y', 50);
+    s = document.createTextNode('SVG hyperlink');
+    
+    t.appendChild(s);
+    a.appendChild(t);
+    svg.appendChild(a);
+    return a;
+  };
+  
+  
+  document
+      .querySelector('button.createA')
+      .addEventListener('click', scope.createA);
+  
+  /*
+  onSvgLoaded = function () {
+    var $svg;
+    $svg  = $( this.getSVGDocument().documentElement );
+    width = $svg.attr('width');
+    console.log('Width:', width);
+  };
+
+  $('embed').each(function () {
+    this.addEventListener('load', onSvgLoaded);
+  });
+  */
+  
+})(this);
+
+</script>
+
+</body>
+</html>

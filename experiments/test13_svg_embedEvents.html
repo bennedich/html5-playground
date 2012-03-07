@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+<style>
+    body { font-family: 'Helvetica Neue', helvetica, arial, sans-serif }
+</style>
+</head>
+<body>
+
+<h1>Eventlisteners on embedded SVG elements</h1>
+
+<embed type='image/svg+xml' src='rect01.svg'>
+<pre></pre>
+
+<script>
+
+var pre, emb, log, svg, rect;
+
+pre = document.querySelector( 'pre' );
+emb = document.querySelector( 'embed' );
+
+
+log = function ( e ) {
+  pre.textContent = e.type;
+};
+
+
+emb.addEventListener( 'load', function () {
+  svg  = emb.getSVGDocument();
+  rect = svg.querySelector( 'rect' );
+
+  rect.addEventListener( 'click',     log );
+  rect.addEventListener( 'mousemove', log );
+  rect.addEventListener( 'mouseout',  log );
+} );
+
+</script>
+
+</body>
+</html>
