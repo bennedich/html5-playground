@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+    input {
+        display: block;
+        outline: none;
+    }
+    </style>
+</head>
+<body>
+
+    <button name="newWindow">Ext window</button>
+    <button name="transferWorker">Transfer worker to other window</button>
+    <input name="sendMessage" tabindex="1" placeholder="Type message"/>
+    <pre id="output"></pre>
+
+<script>
+
+var DEDICTATED_WORKER, SHARED_WORKER, EXTWINDOW,
+    isOpen, ext, worker, currentWorkerPort,
+    openExternalWindow, openedWindow, closedWindow, manageWindow,
+    initWorker, manageWorker, transferWorker,
+    sendMessage, out,
+    output, buttonNewWindow, buttonTransferWorker, inputSendMessage;
+
+DEDICATED_WORKER = 'test24_sharedWorkers_messagePorts_multipleWindows_dedicatedWorker.js';
+SHARED_WORKER    = 'test24_sharedWorkers_messagePorts_multipleWindows_sharedWorker.js';
+EXTWINDOW        = location.href.replace(/[^/]*$/, '') + 'test24_sharedWorkers_messagePorts_multipleWindows_ext.html';
+
+isOpen = false;
+ext    = null;
+worker = null;
+
+
+
+// WINDOW
+
+openExternalWindow = function () {
+    if ( isOpen ) {
+        out( 'Ext window already open' );
+        return;
+    }
+    ext = window.open( EXTWINDOW, 'ext', 'width=640,height=360,top=0,left=0' );
+    ext.onload = openedWindow;
+    window.onmessage = manageWindow;
+    isOpen = true;
+};
+
+
+openedWindow = function () {
+    ext.onunload = closedWindow;
+    out( 'Ext window opened' );
+};
+
+
+closedWindow = function () {
+    out( 'Ext window closed' );
+    isOpen = false;
+};
+
+
+manageWindow = function ( e ) {
+    out( 'From Ext window: '+ e.data );
+};
+
+
+
+// WORKER
+
+initWorker = function () {
+    if ( worker ) {
+        out( 'Worker already initalized' );
+        return;
+    };
+    
+    if ( window.SharedWorker ) {
+        worker = new SharedWorker( SHARED_WORKER );
+        workerPort = worker.port;
+        workerPort.onmessage = manageWorker;
+        workerPort.start();
+        out( 'SharedWorker initialized' );
+    }
+    
+    else {
+        worker = new Worker( DEDICATED_WORKER );
+        workerPort = worker;
+        workerPort.onmessage = manageWorker;
+        workerPort.postMessage( 'init!' );
+        out( 'Worker initialized (dedicated; ie no SharedWorker support)' );
+    }
+};
+
+
+manageWorker = function ( e ) {
+    var msg = 'From worker: ' + e.data;
+    if ( e.ports )
+        msg += ' [worker sent '+ e.ports.length +' ports]';
+    out( msg );
+};
+
+
+transferWorker = function () {
+    if ( !isOpen ) {
+        console.log( '**');
+        out( 'Open ext window first!' );
+        return;
+    }
+    
+    if ( worker.constructor !== window.SharedWorker ) {
+        out( 'Your browswer doesnt support SharedWorker. Transfer aborted :(' );
+        return;
+    }
+    
+    ext.postMessage('workerPort', '*', [ workerPort ] );
+    out( 'Transferred worker port to ext window' );
+};
+
+
+
+// MAIN
+
+sendMessage = function ( e ) {
+    var msg = inputSendMessage.value;
+    if ( e.keyCode !== 13 )
+        return;
+    if ( worker )
+        workerPort.postMessage( msg );
+    if ( ext )
+        ext.postMessage( msg, '*' ); // '*' or EXTWINDOW
+    inputSendMessage.value = '';
+    inputSendMessage.focus();
+};
+
+
+
+out = function ( msg ) {
+    output.textContent += msg + '\n';
+};
+
+
+
+// BEGIN
+
+output = document.querySelector( '#output' );
+
+buttonNewWindow = document.querySelector( '[name=newWindow]' );
+buttonNewWindow.onclick = openExternalWindow;
+
+buttonTransferWorker = document.querySelector( '[name=transferWorker]' );
+buttonTransferWorker.onclick = transferWorker;
+
+initWorker();
+
+inputSendMessage = document.querySelector( '[name=sendMessage]' );
+inputSendMessage.onkeydown = sendMessage;
+inputSendMessage.focus();
+
+</script>
+
+</body>
+</html>

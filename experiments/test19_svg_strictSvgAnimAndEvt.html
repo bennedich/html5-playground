@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<style>
+    body { font-family: 'Helvetica Neue', helvetica, arial, sans-serif }
+</style>
+</head>
+<body>
+
+<!-- http://www.w3.org/TR/SVG/animate.html#AnimateTransformElement -->
+<!-- http://www.w3.org/TR/SVG/coords.html#TransformAttribute -->
+<!-- http://www.w3.org/TR/SVG/interact.html#SVGEvents -->
+<!-- http://www.w3.org/TR/2001/REC-smil-animation-20010904/ -->
+  
+  <h1>Strict SVG animation and events</h1>
+  <pre>click first red rect and black rect</pre>
+  
+  <svg
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    width="400"
+    height="400">
+
+    <rect x="-75" y="-50" width="150" height="100" fill="red" transform="translate(100,100)">
+      <animateTransform
+        attributeName="transform" attributeType="XML"
+        begin="click" type="rotate" from="0" to="90"
+        dur="3s" additive="sum" fill="freeze"/>
+    </rect>
+
+    <rect x="-75" y="-50" width="150" height="100" fill="red" transform="translate(300,100)">
+      <animateTransform
+        attributeName="transform" attributeType="XML"
+        begin="foo.click" type="rotate" from="0" to="90"
+        dur="3s" additive="sum" fill="freeze"/>
+    </rect>
+
+    <rect id="foo" x="270" y="180" width="60" height="30" fill="black"/>
+
+  </svg>
+
+</body>
+</html>

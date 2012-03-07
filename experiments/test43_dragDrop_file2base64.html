@@ -1,0 +1,263 @@
+<style>
+
+.dropzone {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    width: 512px;
+    height: 260px;
+    margin: 20px auto;
+    
+    border: 8px dashed #999;
+    border-radius: 5px;
+    
+    color: #999;
+    
+    -webkit-transition: all .1s ease;
+    -moz-transition: all .1s ease;
+    -ms-transition: all .1s ease;
+    -o-transition: all .1s ease;
+    transition: all .1s ease;
+}
+
+.dropzone > h1 {
+    font: 900 50px/1 Arial;
+    text-align: center;
+    letter-spacing: -3px;
+    margin-top: 100px;
+    pointer-events: none;
+}
+
+.dropzone.selected {
+    border-color: #444;
+    color: #444;
+}
+
+
+.options, .options input {
+    width: 250px;
+    margin: 0 auto;
+    
+    font: 14px/1 Arial;
+    color: #444;
+}
+
+.options input {
+    max-width: 40px;
+}
+
+
+
+#outputField {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    width: 960px;
+    margin: 20px auto 50px;
+    padding: 10px 15px;
+    
+    border: 1px solid #999;
+    
+    overflow: auto;
+    
+    font: 10px/1 'Courier New', courier, monospace;
+    text-align: center;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+
+</style>
+
+
+<section id='dropzone' class='dropzone'>
+    <h1>file &raquo; base64</h1>
+</section>
+
+<table class='options'>
+    <tbody>
+        <tr>
+            <td>Line breaks/width</td>
+            <td><input name='lbBool' type='checkbox'></td>
+            <td><input name='lineWidth' value='78'></td>
+        </tr>
+        <tr>
+            <td>Line break char</td>
+            <td><input name='lbCharBool' type='checkbox'></td>
+            <td><input name='lbChar' value='&#92;'></td>
+        </tr>
+        <tr>
+            <td>Char count</td>
+            <td colspan='2' name='charCount'>-</td>
+        </tr>
+    </tbody>
+</table>
+
+<section id='outputField'><p>Output</p></section>
+
+
+
+
+<script>
+
+var Dropzone, outputField, outputFiles, readFile, outputData;
+
+
+Dropzone = ( function () {
+    
+    var p;
+    
+    function Dropzone ( selector, callback ) {
+        var el = document.querySelector( selector );
+        
+        this._onDragEnter = this._onDragEnter.bind( this );
+        this._onDragOver = this._onDragOver.bind( this );
+        this._onDragLeave = this._onDragLeave.bind( this );
+        this._onDrop = this._onDrop.bind( this );
+        
+        el.addEventListener( 'dragenter', this._onDragEnter );
+        el.addEventListener( 'dragover', this._onDragOver );
+        el.addEventListener( 'dragleave', this._onDragLeave );
+        el.addEventListener( 'drop', this._onDrop );
+        
+        this.selector = selector;
+        this.callback = callback;
+        this.domElement = el;
+    }
+    
+    p = Dropzone.prototype;
+    
+    p._stopEvt = function ( evt ) {
+        evt.stopPropagation();
+        evt.preventDefault();
+    };
+     
+    p._onDragEnter = function ( evt ) {
+        
+        this._stopEvt( evt );
+        if ( evt.target === this.domElement )
+            this.domElement.classList.add( 'selected' );
+    };
+    
+    p._onDragOver  = function ( evt ) {
+        this._stopEvt( evt );
+    };
+    
+    p._onDragLeave = function ( evt ) {
+        this._stopEvt( evt );
+        if ( evt.target === this.domElement )
+            this.domElement.classList.remove( 'selected' );
+    };
+    
+    p._onDrop = function ( evt ) {
+        var files, count;
+        this._onDragLeave( evt );
+        files = evt.dataTransfer.files;
+        this.callback( files );
+    };
+    
+    return Dropzone;
+    
+} )();
+
+
+outputField = document.querySelector( '#outputField' );
+
+
+outputField.addEventListener( 'click', function ( evt ) {
+    var sel, range;
+    sel = window.getSelection();
+    range = document.createRange();
+    range.selectNodeContents( evt.target );
+    sel.removeAllRanges();
+    sel.addRange( range );
+} );
+
+
+outputFile = function ( files ) {
+    var file = files[ 0 ];
+    readFile( file );
+    //var i, l, f;
+    //for ( i=0, l=files.length; f=files[ i ]; i++ )
+    //    readFile( f );
+};
+
+
+readFile = function ( f ) {
+    var reader = new FileReader();
+    reader.onload = function ( evt ) {
+        var data = evt.target.result;
+        window.latestData = data;
+        outputData( data );
+    };
+    reader.readAsDataURL( f );
+};
+
+
+
+fieldLbBool = document.querySelector('[name=lbBool]');
+fieldLineW = document.querySelector('[name=lineWidth]');
+fieldUseLbChar = document.querySelector('[name=lbCharBool]');
+fieldLbChar = document.querySelector('[name=lbChar]');
+fieldCharCount = document.querySelector('[name=charCount]');
+
+
+
+
+outputData = function ( data ) {
+    var w, lbChar, useLb, useLbChar;
+    
+    useLb = fieldLbBool.checked;
+    w = parseInt( fieldLineW.value, 10 );
+    useLbChar = fieldUseLbChar.checked;
+    lbChar = fieldLbChar.value;
+    
+    if ( ! useLb ) {
+        outputField.textContent = data;
+        fieldCharCount.textContent = data.length;
+        return;
+    }
+    
+    if ( useLbChar ) {
+        pttrn = new RegExp( '.{1,'+ (w-1) +'}', 'g' );
+        data = data.match( pttrn );
+        data = data.join( lbChar + '\n' );
+    }
+        
+    else {
+        pttrn = new RegExp( '.{1,'+ w +'}', 'g' );
+        data = data.match( pttrn );
+        data = data.join( '\n' );
+    }
+    
+    outputField.textContent = data;
+    fieldCharCount.textContent = data.length;
+};
+
+
+onOptionsChange = function ( evt ) {
+    if ( outputField.firstChild.nodeType === outputField.firstChild.TEXT_NODE )
+        outputData( latestData );
+};
+
+
+
+fieldLbBool.addEventListener( 'change', onOptionsChange );
+fieldLineW.addEventListener( 'change', onOptionsChange );
+fieldUseLbChar.addEventListener( 'change', onOptionsChange );
+fieldLbChar.addEventListener( 'change', onOptionsChange );
+
+
+
+
+new Dropzone( '#dropzone', outputFile );
+
+
+
+</script>
+
+
+
+
+
+
