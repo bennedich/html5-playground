@@ -27,5 +27,5 @@ a:hover {
 }
 
 a::before {
-    content: '» ';
+    content: '\00BB  ';
 }
