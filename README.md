@@ -1,6 +1,6 @@
 <link href="https://raw.github.com/bennedich/web-playground/master/markdown.css" rel="stylesheet"></link>
 
-<h1>Web related experiments</h1>
+<h1>Web Playground: a collection of experiments</h1>
 
 <p><a href="http://bennedich.github.com/web-playground/experiments/test0_svg_hyperlinks.html">SVG hyperlinks</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test2_xhrSniffer.html">XHR sniffer boilerplate</a></p>
