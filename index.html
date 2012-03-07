@@ -6,7 +6,6 @@
 <p><a href="http://bennedich.github.com/web-playground/experiments/test2_xhrSniffer.html">XHR sniffer boilerplate</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test3_svg_jQuerySVG_events.html">jQuery SVG events</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test7_svg_getRotationFromCTM.html">SVG get rotation from CTM</a></p>
-<p><a href="http://bennedich.github.com/web-playground/experiments/test13_svg_embedEvents.html">SVG embed events</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test14_svg_dynamicPartialCircle.html">SVG dynamic circle pie</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test16_svg2canvas2img.html">SVG &raquo; canvas &raquo; img</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test19_svg_strictSvgAnimAndEvt.html">SVG strict animation & events</a></p>
