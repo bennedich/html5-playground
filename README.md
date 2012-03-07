@@ -16,4 +16,5 @@
 <p><a href="http://bennedich.github.com/web-playground/experiments/test31_svg_resize_preserve_font.html">SVG resizing while preserving font size</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test38_webgl.html">WebGL 2d animation with gl_points</a></p>
 <p><a href="http://bennedich.github.com/web-playground/experiments/test43_dragDrop_file2base64.html">File &raquo; base64 converter, drag & drop and dynamic line breaks</a></p>
+<p><a href="http://bennedich.github.com/web-playground/experiments/test44_css3_notifications.html">CSS3 notifications</a></p>
 
