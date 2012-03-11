@@ -1,0 +1,108 @@
+<!doctype html>
+<title>CSS3 click events</title>
+<link rel="stylesheet" href="http://bennedich.github.com/main.css" />
+<style>
+
+html {
+    background-image: -webkit-radial-gradient( ellipse, #700, #300 );
+    background-image: -moz-radial-gradient( ellipse, #700, #300 );
+    background-image: -ms-radial-gradient( ellipse, #700, #300 );
+    background-image: -o-radial-gradient( ellipse, #700, #300 );
+    background-image: radial-gradient( ellipse, #700, #300 );
+}
+
+body {
+    background: none;
+}
+
+body > h1 {
+    position: absolute;
+    top: 46%;
+    width: 100%;
+    color: #300;
+    text-align: center;
+    text-shadow: 0 1px 0 #900;
+}
+
+
+/*****************
+** click events **
+*****************/
+
+.about > * {
+    position: absolute;
+    cursor: pointer;
+}
+
+.about input:first-child {
+    clip: rect(0,0,0,0);
+}
+
+.about > h1 {
+    top: 15px;
+    right: 15px;
+    width: 64px;
+    margin: 0;
+    padding: 15px;
+    opacity: .4;
+    font-size: 64px;
+    line-height: 1;
+    text-align: center;
+    color: #500;
+    background-color: #000;
+    
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    
+    border-radius: 50%;
+    
+    -webkit-transition: opacity .1s ease-in-out;
+}
+
+.about > input:checked ~ h1 {
+    opacity: 0;
+}
+
+.about > section {
+    top: 50%;
+    left: 50%;
+    
+    -webkit-box-sizing: border-box;
+    
+    width: 512px;
+    height: 320px;
+    margin: -160px 0 0 -256px;
+    padding: 20px 30px;
+    
+    background-color: #200;
+    opacity: 0;
+    border-radius: 4px;
+    -webkit-transition: opacity .1s ease-in-out;
+}
+
+.about > input:checked ~ section {
+    opacity: 1;
+}
+
+.about > section h1 {
+    color: #700;
+    margin-top: 110px;
+}
+
+</style>
+
+
+<h1>click it &nbsp;&#10138;</h1>
+
+
+<label class='about'>
+    <input type='checkbox' />
+    <h1>?</h1>
+    <section>
+        <h1>CSS3 click events</h1>
+    </section>
+</label>
+
+
+
