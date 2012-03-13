@@ -1,0 +1,175 @@
+<!doctype html>
+<title>fib</title>
+<link rel='stylesheet' href='http://bennedich.github.com/main.css' />
+
+<style>
+
+body {
+    background-image: -webkit-radial-gradient( ellipse, #700, #300 );
+    background-image: -moz-radial-gradient( ellipse, #700, #300 );
+    background-image: -ms-radial-gradient( ellipse, #700, #300 );
+    background-image: -o-radial-gradient( ellipse, #700, #300 );
+    background-image: radial-gradient( ellipse, #700, #300 );
+}
+
+h1 {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    color: #100;
+    text-align: center;
+    text-shadow: 0 1px 0 #500;
+}
+
+#fib > div {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -box-sizing: border-box;
+    
+    position: absolute;
+    border: 2px solid #300;
+    background-color: transparent;
+    
+    -webkit-animation: fadeIn .6s ease;
+    -moz-animation: fadeIn .6s ease;
+    animation: fadeIn .6s ease;
+}
+
+@-webkit-keyframes fadeIn {
+    0%   { opacity: 0 }
+    100% { opacity: 1 }
+}
+
+@-moz-keyframes fadeIn {
+    0%   { opacity: 0 }
+    100% { opacity: 1 }
+}
+
+@keyframes fadeIn {
+    0%   { opacity: 0 }
+    100% { opacity: 1 }
+}
+
+</style>
+
+
+<h1>fib</h1>
+<section id='fib'></section>
+
+
+<script>
+
+( function ( scope ) {
+    'use strict';
+    var p = Fib.prototype;
+    
+    function Fib ( selector ) {
+        this.selector = selector;
+        this.dom = document.querySelector( selector );
+        this.a = 0;
+        this.b = 1;
+        this.d = this.UP;
+    }
+    
+    
+    p.UP = 0;
+    p.LEFT = 1;
+    p.DOWN = 2;
+    p.RIGHT = 3;
+    
+    
+    p._getOffset = function ( el ) {
+        var x=0, y=0;
+        do {
+            x += el.offsetLeft;
+            y += el.offsetTop;
+        } while ( el = el.offsetParent );
+        return { x:x, y:y };
+    };
+    
+    
+    p.init = function () {
+        var e, s;
+        e = document.createElement( 'div' );
+        s = e.style;
+        s.width  = 0;
+        s.height = 0;
+        s.top  = '50%';
+        s.left = '50%';
+        this.dom.appendChild( e );
+    };
+    
+    
+    p.draw = function () {
+        var m = 3, // offset modifier
+            p = this._getOffset( this.dom.lastChild );
+        p.x -= Math.round( window.innerWidth/2 );
+        p.y -= Math.round( window.innerHeight/2 );
+        switch ( this.d ) {
+            case this.UP:
+                p.x -= this.b * m;
+                break;
+            case this.LEFT:
+                p.y += this.a * m;
+                break;
+            case this.DOWN:
+                p.x += this.a * m;
+                p.y -= ( this.b - this.a ) * m;
+                break;
+            case this.RIGHT:
+                p.x -= ( this.b - this.a ) * m;
+                p.y -= this.b * m;
+                break;
+        }
+        this._drawEl( this.b*m, this.b*m, p.x, p.y );
+    };
+    
+    
+    p._drawEl = function ( w, h, x, y ) {
+        var e, s;
+        e = document.createElement( 'div' );
+        s = e.style;
+        s.width  = w + 'px';
+        s.height = h + 'px';
+        s.top  = '50%';
+        s.left = '50%';
+        s.marginTop  = y + 'px';
+        s.marginLeft = x + 'px';
+        this.dom.appendChild( e );
+    };
+    
+    
+    p.update = function () {
+        // update fib
+        var t;
+        t = this.a + this.b;
+        this.a = this.b;
+        this.b = t;
+        
+        // update direction
+        this.d = ( this.d + 1 ) % 4;
+    };
+    
+    
+    p.tick = function () {
+        this.draw();
+        this.update();
+    };
+    
+    
+    p.animate = function () {
+        var id, i=0;
+        this.init();
+        id = setInterval( (function () {
+            if ( i++ > 20 )
+                clearInterval( id );
+            this.tick();
+        }).bind( this ), 1000 );
+    };
+    
+    scope.m = new Fib( '#fib' );
+    m.animate();
+    
+} )( this );
+
+</script>

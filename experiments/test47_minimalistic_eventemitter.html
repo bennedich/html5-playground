@@ -1,0 +1,125 @@
+<!doctype html>
+<title>Minimalistic EventEmitter</title>
+<link rel='stylesheet' href='http://bennedich.github.com/main.css' />
+
+<style>
+
+#out {
+    position: absolute;
+    color: #ccc;
+    font-weight: 900;
+    height: 100%;
+    overflow: hidden;
+}
+
+.paper {
+    width: 640px;
+    margin: 60px auto;
+}
+
+.paper h3 {
+    margin-bottom: 20px;
+}
+
+.source {
+    font-size: 12px;
+}
+
+.source * {
+    background-color: transparent !important;
+}
+
+</style>
+
+
+<pre id='out'>Demo
+</pre>
+
+<section class='paper'>
+    <div class='shadowWrapper'>
+        <h3>Minimalistic EventEmitter</h3>
+        <div class='source'>
+        <script src="https://gist.github.com/2026055.js"></script>
+        </div>
+    </div>
+</section>
+
+
+<script>
+
+/*****************
+** EventEmitter **
+*****************/
+
+( function ( scope ) {
+	'use strict';
+	var p = EventEmitter.prototype;
+	
+	function EventEmitter () {
+	    this._lstnrs = {};
+	}
+	
+	p.on = function ( e, lstnr ) {
+	    if ( ! this._lstnrs.hasOwnProperty( e ) ) this._lstnrs[ e ] = [];
+	    this._lstnrs[ e ].push( lstnr );
+	};
+	
+	p.off = function ( e, lstnr ) {
+	    var i = this._lstnrs[ e ].indexOf( lstnr );
+	    this._lstnrs[ e ].splice( i, 1 );
+	};
+	
+	p.emit = function ( e, arg ) {
+	    var i = 0, lstnr, lstnrs = this._lstnrs[ e ];
+	    if ( ! lstnrs ) return;
+	    while ( lstnr = lstnrs[ i++ ] ) lstnr( arg );
+	};
+	
+	scope.EventEmitter = EventEmitter;
+} )( this );
+
+
+/*******************
+** IMPLEMENTATION **
+*******************/
+
+( function ( scope ) {
+    'use strict';
+    var p = Main.prototype;
+    
+    function Main () {
+        this.e = new EventEmitter;
+        this.pre = document.querySelector( '#out' );
+        this.uid = null;
+        this.init();
+        this.start();
+    }
+    
+    p.init = function () {
+        var self = this,
+            i = 0;
+        // add listener
+        this.e.on( 'update', function onUpdate ( timestamp ) {
+            self.pre.textContent += timestamp + ' `update` emitted\n';
+            if ( i++ > 10 ) {
+                // remove listener
+                clearInterval( self.uid );
+                self.e.off( 'update', onUpdate );
+                self.pre.textContent += 'Stopped';
+            }
+        } );
+    };
+    
+    p.start = function () {
+        var self = this;
+        this.uid = setInterval( function () {
+            self.e.emit( 'update', Date.now() );
+        }, 1e3 );
+    };
+    
+    //scope.Main = Main;
+    new Main;
+} )( this );
+
+
+</script>
