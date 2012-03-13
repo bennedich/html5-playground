@@ -4,7 +4,11 @@
 
 .paper {
     width: 640px;
-    margin-left: 60px auto;
+    margin: 60px auto;
+}
+
+.paper > .shadowWrapper {
+    height: auto;
 }
 
 .buttons {
@@ -19,12 +23,6 @@
 }
 
 .source {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
     font-size: 12px;
 }
 
@@ -83,9 +81,9 @@
 
 <section class='paper'>
     <div class='shadowWrapper'>
-    </div>
-    <div class='source'>
-        <script src="https://gist.github.com/1993585.js"> </script>
+        <div class='source'>
+            <script src="https://gist.github.com/1993585.js"> </script>
+        </div>
     </div>
 </section>
 

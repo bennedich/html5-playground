@@ -51,7 +51,7 @@
 ** EventEmitter **
 *****************/
 
-( function ( scope ) {
+var EventEmitter = ( function () {
 	'use strict';
 	var p = EventEmitter.prototype;
 	
@@ -66,7 +66,7 @@
 	
 	p.off = function ( e, lstnr ) {
 	    var i = this._lstnrs[ e ].indexOf( lstnr );
-	    this._lstnrs[ e ].splice( i, 1 );
+	    i > -1 && this._lstnrs[ e ].splice( i, 1 );
 	};
 	
 	p.emit = function ( e, arg ) {
@@ -75,51 +75,85 @@
 	    while ( lstnr = lstnrs[ i++ ] ) lstnr( arg );
 	};
 	
-	scope.EventEmitter = EventEmitter;
-} )( this );
+	return EventEmitter;
+} )();
 
 
 /*******************
 ** IMPLEMENTATION **
 *******************/
 
-( function ( scope ) {
+var Fib = ( function () {
+    'use strict';
+    var p;
+    
+    /*  Emits fibonacci number sequence
+    */
+    function Fib () {
+        // call parent constructor
+        EventEmitter.call( this );
+        // set seed values
+        this.a = 0;
+        this.b = 1;
+        this.uid = null;
+    }
+    
+    // inherit EventEmitter
+    p = Fib.prototype = Object.create(
+        EventEmitter.prototype,
+        { constructor : { value : Fib } }
+    );
+    
+    p.start = function ( ms ) {
+        if ( ! this.uid )
+            this.uid = setInterval( this.next.bind( this ), ms );
+    };
+    
+    p.stop = function () {
+        clearInterval( this.uid );
+        this.uid = null;
+    };
+    
+    p.next = function () {
+        var nxt = this.a + this.b;
+        this.a = this.b;
+        this.b = nxt;
+        this.emit( 'next', nxt );
+    };
+    
+    return Fib;
+} )();
+
+
+
+var m = ( function () {
     'use strict';
     var p = Main.prototype;
     
+    /*  Listens and outputs data from Fib instance
+    */
     function Main () {
-        this.e = new EventEmitter;
-        this.pre = document.querySelector( '#out' );
-        this.uid = null;
-        this.init();
-        this.start();
-    }
-    
-    p.init = function () {
-        var self = this,
-            i = 0;
-        // add listener
-        this.e.on( 'update', function onUpdate ( timestamp ) {
-            self.pre.textContent += timestamp + ' `update` emitted\n';
-            if ( i++ > 10 ) {
-                // remove listener
-                clearInterval( self.uid );
-                self.e.off( 'update', onUpdate );
-                self.pre.textContent += 'Stopped';
-            }
-        } );
+        this.onNext = this.onNext.bind( this );
+        this.out = document.querySelector( '#out' );
+        this.initFib();
     };
     
-    p.start = function () {
-        var self = this;
-        this.uid = setInterval( function () {
-            self.e.emit( 'update', Date.now() );
-        }, 1e3 );
+    p.initFib = function () {
+        this.fib = new Fib;
+        this.fib.start( 1e2 );
+        this.fib.on( 'next', this.onNext );
     };
     
-    //scope.Main = Main;
-    new Main;
-} )( this );
-
+    p.onNext = function ( x ) {
+        this.out.textContent += 'Emitted '+ x + '\n';
+        if ( x > 1000 ) {
+            this.fib.stop();
+            this.fib.off( 'next', this.onNext );
+            this.out.textContent += 'stopped';
+        }
+    };
+    
+    return new Main;
+} )();
 
 </script>
