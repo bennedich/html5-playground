@@ -1,5 +1,5 @@
 /*
-CleverBot duel
+Cleverbot duel
 
 Joakim Bennedich
 2012-03-13
@@ -44,7 +44,7 @@ var EventEmitter = ( function () {
 
 
 /************************
-** CleverBot UIWrapper **
+** Cleverbot UIWrapper **
 ************************/
 
 var UIWrapper = ( function () {
