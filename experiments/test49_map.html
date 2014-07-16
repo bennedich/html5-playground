@@ -1,0 +1,340 @@
+<!doctype html>
+<head>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style>
+		@import url(http://yui.yahooapis.com/3.4.1/build/cssreset/cssreset-min.css);
+		@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,700);
+
+		html, body {
+			height: 100%;
+			overflow: auto;
+		}
+		body {
+			margin: 0;
+			padding: 0;
+		}
+
+
+		.spinner {
+			-webkit-animation-name: spinner;
+			-webkit-animation-duration: 1s;
+			-webkit-animation-iteration-count: infinite;
+			-webkit-animation-timing-function: cubic-bezier(.85, 0, .15, 1);
+			
+			-moz-animation-name: spinner;
+			-moz-animation-duration: 1s;
+			-moz-animation-iteration-count: infinite;
+			-moz-animation-timing-function: cubic-bezier(.85, 0, .15, 1);
+		}
+		@-webkit-keyframes spinner {
+			0%	{ -webkit-transform: rotate(0deg); }
+			25%	{ -webkit-transform: rotate(0deg); }
+			100%	{ -webkit-transform: rotate(90deg); }
+		}
+		@-moz-keyframes spinner {
+			0%	{ -moz-transform: rotate(0deg); }
+			25%	{ -moz-transform: rotate(0deg); }
+			100%	{ -moz-transform: rotate(90deg); }
+		}
+
+
+		#scene_loading {
+			transition: opacity 0.7s linear;
+			opacity: 0.0;
+
+			position: absolute;
+			z-index: 2;
+			width: 100%;
+			height: 100%;
+
+			box-shadow: inset 0 0 64px #443;
+	
+			background-image: -webkit-radial-gradient( ellipse, #fff, #eee, #ccc, #888 );
+			background-image: -moz-radial-gradient( ellipse, #fff, #eee, #ccc, #888 );
+			background-image: radial-gradient( ellipse, #fff, #eee, #ccc, #888 );
+			
+			font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+			color: #444;
+		}
+		#scene_loading.fadein {
+			opacity: 1.0;
+		}
+		#scene_loading > p {
+			position: absolute;
+			z-index: 1;
+			top: 50%;
+			width: 100%;
+			margin-top: -15px;
+			text-align: center;
+			font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+			font-weight: bold;
+			font-size: 20px;
+			color: #fff;
+		}
+		#scene_loading > .spinner {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin: -50px 0 0 -50px;
+			width: 100px;
+			height: 100px;
+			background-color: #444;
+		}
+
+
+		#scene_map {
+			transition: opacity 0.7s linear;
+			opacity: 0.0;
+
+			position: absolute;
+			z-index: 1;
+			width: 100%;
+			height: 100%;
+		}
+		#scene_map.fadein {
+			opacity: 1.0;
+		}
+	</style>
+</head>
+<body>
+
+<div id="scene_loading">
+	<p>Loading</p>
+	<div class="spinner"></div>
+</div>
+
+<div id="scene_map"></div>
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key="></script>
+<script type="text/javascript">
+/*********
+** MISC **
+*********/
+
+window.StringAux = {
+	format: function (str, varargs) {
+		varargs = Array.prototype.slice.call(arguments, 1);
+		return str.replace(/{(\d+)}/g, function (match, number) {
+			return typeof(varargs[number]) != 'undefined' ? varargs[number] : match;
+		});
+	},
+}
+
+window.params = (function(){
+	var params = {};
+	window.location.search.substr(1).split("&").forEach(function(pairStr, i) {
+		var pairArray = pairStr.split("=");
+		params[decodeURIComponent(pairArray[0])] = decodeURIComponent(pairArray[1]);
+	});
+	return params;
+})()
+
+window.log = function (str, varargs) {
+	varargs = Array.prototype.slice.call(arguments);
+	var timeSinceLaunch = (Date.now() - log._launchTime) / 1000;
+	console.log(StringAux.format("{0} {1}", timeSinceLaunch.toFixed(3), StringAux.format.apply(StringAux, varargs)));
+}
+
+window.log._launchTime = Date.now();
+
+</script>
+<script type="text/javascript">
+/***********
+** ASSETS **
+***********/
+
+window.urlGeolocationCenterIcon =
+"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAdCAYAAABWk2cPAAAAAXNSR0I\
+Ars4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJl\
+AHBhaW50Lm5ldCA0LjAuMWLo9nwAAAFWSURBVEhL7ZUhcgJBEEVXIBAcBhERwWEQiIjIiEgcAskF9\
+i6ICAQiIpIjcICITb/t38WyxYba3lQqVdlf9Wv5PT090z3TQzFixD9AWU2MK+POeDCe9UUvjVN5/h\
+DKam48Gqtv+GF81IyBKKsn46cCszDZsompvug3I+P4vWpmEh6UQHBrvF1CL/1afjCZsQeKkm5lIzu\
+Cn2Tni/bN+O8odeKMvWxRUhaDe9naxM54c6NLReoBv5VMXklHFl1cy+9ZelfrXvB2YPJcOkraxZP8\
+HqQPte4F70Mmx3k1F7hN95tJn2vdC/lMufHoVKbtM91Id3Ejv7iAqTONyTQ+t5KyvcvWJnbG8YuHI\
+nV7aQH6jQBxMwlMxs0+Rc80/iJ7sk8BL8vllaFlJhq5hmfIgvix6EIjSfCWXoLde3uhV2UwPOModR\
+cZH5hhG54ZWf3S/+mIEX8PRfEFGIsHX0isSSoAAAAASUVORK5CYII=";
+
+window.urlGeolocationCenterIconHeading =
+"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAdCAYAAABWk2cPAAAAAXNSR0I\
+Ars4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJl\
+AHBhaW50Lm5ldCA0LjAuMWLo9nwAAAGWSURBVEhL7ZYvUkNBDMYrEBUVPUoFooIj9BAVFQgkAllXg\
+ewB2HswKASiAoFAVhTfAyDC/l6+pctOC/O2f2aY6TfzzTbZbPKyL8lrpwrBLiIfmvVkCHYfac16Eg\
+QbRn4qKOtQO0dCsF7kUgETkXuyOAKCzbNgOeeyODCCjYpAJUeyPBCC9SNXWYBt/Ijs68QBEOwxc/4\
+bn3RiTwS7jkzV+ho5iRxEdrUiv0Syj92dTlbCneII0ptd7fyED4up7GBlG7kjMiMDHwKeHc5T27Ai\
++8P4b/Tv37pW8GtLV0ow+CxdSfTs5w86lqcW2PTkRHLKYhensruRXNG7wRY6PJBcTqKSS9ldSl40c\
+isEW+twel95gO10O0Yl8rqRW6E+UyoeuSrT8p3OJO/iTHapAKveaTpM41OVXNubdCXRs49dGhRV1U\
+sL0G84SJWJYzLO+xTZP23BbqWv7FOw+WBDWmb73xPPkIDYEfRKO5Vglm6c/TV7od/K3vCM01XvIvt\
+7ZljCMyMrqpp2oo9ZkceRle/wjDP+DzqdLwO1YC5na1GEAAAAAElFTkSuQmCC";
+
+</script>
+<script type="text/javascript">
+/********
+** APP **
+********/
+
+// relevant links:
+//
+// https://developers.google.com/maps/documentation/javascript/overlays
+// https://developers.google.com/maps/documentation/javascript/reference
+// https://developers.google.com/maps/documentation/javascript/examples/
+//
+// https://developer.mozilla.org/en-US/docs/Web/API/Geolocation
+// https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/Using_geolocation
+
+
+//var urlImg = "http://www.tyresta.se/tyresta-karta/tyresta_karta_20111031_300.jpg";
+//var urlImg = "http://ravinenkartor.se/map_images/219.jpg";
+var urlImg = "https://raw.githubusercontent.com/bennedich/web-playground/master/experiments/poop_alpha_128.png";
+//var urlImg = "http://192.168.43.40:8080/poop_alpha_128.png";
+
+var mapCenter = new google.maps.LatLng(
+	params.hasOwnProperty("lat") ? parseFloat(params.lat) : 59.29,
+	params.hasOwnProperty("lng") ? parseFloat(params.lng) : 18.19);
+
+var mapZoom = params.hasOwnProperty("zoom") ? parseInt(params.zoom) : 14;
+
+var sceneLoading = document.querySelector("#scene_loading");
+var sceneMap = document.querySelector("#scene_map");
+
+
+window.initMap = function () {
+	var coordsBottomLeft = new google.maps.LatLng(59.282535, 18.171828);
+	var coordsTopRight = new google.maps.LatLng(59.302957, 18.225583);
+
+	var imageBounds = new google.maps.LatLngBounds(coordsBottomLeft, coordsTopRight);
+
+	var mapOptions = {
+		center: mapCenter,
+		zoom: mapZoom,
+	};
+
+// TODO global
+	window.map = new google.maps.Map(sceneMap, mapOptions);
+
+	var overlay = new google.maps.GroundOverlay(urlImg, imageBounds);
+
+	overlay.setMap(map);
+}
+
+
+window.initGeolocation = function () {
+	var geolocationCenterIcon = {
+		url: urlGeolocationCenterIcon,
+		size: new google.maps.Size(29, 29),
+		scaledSize: new google.maps.Size(29, 29),
+		origin: new google.maps.Point(0,0),
+		anchor: new google.maps.Point(14, 14),
+	}
+
+// TODO global
+	window.geolocationCenterMarker = new google.maps.Marker({
+		position: map.getCenter(),
+		icon: geolocationCenterIcon,
+		draggable: false,
+	});
+
+// TODO global
+	window.geolocationAccuracyCircle = new google.maps.Circle({
+		strokeColor: '#09f',
+		strokeOpacity: 0.5,
+		strokeWeight: 0.5,
+		fillColor: '#09f',
+		fillOpacity: 0.15,
+		radius: 0,
+	});
+
+	geolocationAccuracyCircle.bindTo('center', geolocationCenterMarker, 'position');
+
+	var lastHeading = null;
+	var geolocationCenter = { lat: 0, lng: 0 };
+
+	var success = function (pos) {
+		// pos = {
+		//	timestamp: timestampInMilliseconds,
+		//	coords: { latitude: 1, longitude: 1, altitude: 1, accuracy: 1, altitudeAaccuracy: 1, heading: 1, speed: 1},
+		//}
+		// possible null values: altitude, altitudeAccuracy, heading, speed
+
+		var coords = pos.coords;
+
+		var timeSinceUpdate = (Date.now() - pos.timestamp) / 1000;
+
+		log("Geolocation update ({0} seconds ago) heading: {1} speed: {2}", timeSinceUpdate.toFixed(3), coords.heading, coords.speed);
+		
+		if (!geolocationCenterMarker.getMap())
+			geolocationCenterMarker.setMap(map);
+
+		if (!geolocationAccuracyCircle.getMap())
+			geolocationAccuracyCircle.setMap(map);
+
+// TODO seems like heading is always null, can it be activated on mobile or in chrome somehow?
+		if (coords.heading !== lastHeading) {
+			log("Geolocation heading {0}", coords.heading);
+			geolocationCenterIcon.url = coords.heading === null ? urlGeolocationCenterIcon : urlGeolocationCenterIconHeading;
+			geolocationCenterIcon.rotation = coords.heading; // TODO rads or degs? conversion needed?
+			geolocationCenterMarker.setIcon(geolocationCenterIcon);
+			lastHeading = coords.heading;
+		}
+
+		geolocationCenter.lat = coords.latitude;
+		geolocationCenter.lng = coords.longitude;
+
+//  TODO: use this to center map on gps device
+//		map.setCenter(geolocationCenter);
+
+		geolocationCenterMarker.setPosition(geolocationCenter);
+		geolocationAccuracyCircle.setRadius(coords.accuracy);
+	}
+
+	var error = function (err) {
+		log("Geolocation ERROR {0}: {1}", err.code, err.message);
+		geolocationCenterMarker.setMap();
+		geolocationAccuracyCircle.setMap();
+	}
+
+	var options = {
+		enableHighAccuracy: true,
+		timeout: 30000,
+		maximumAge: 27000,
+	};
+
+// TODO this updates geolocation every second on mobile, for custom interval use setInterval instead
+	var watchId = navigator.geolocation.watchPosition(success, error, options);
+}
+
+
+// set a delay before init so UI doesnt look all poop
+
+setTimeout(function() {
+	log("app init");
+
+	sceneLoading.classList.add("fadein");
+
+	var img = new Image();
+
+	img.addEventListener("load", function() {
+		log("image loaded");
+
+		initMap();
+
+		log("map inited");
+
+		initGeolocation();
+
+		log("geolocation inited");
+
+		sceneLoading.classList.remove("fadein");
+		sceneMap.classList.add("fadein");
+
+		setTimeout(function() {
+			sceneLoading.style.display = "none";
+		}, 1000);
+
+		log("app inited");
+	})
+
+	img.src = urlImg;
+}, 50);
+
+
+</script>
