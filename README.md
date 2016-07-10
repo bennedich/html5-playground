@@ -1,1 +1,1 @@
-<p>Web related experiments. See <a href='http://bennedich.github.com/web-playground/'>demos</a>.
+<p>Web related experiments. See <a href='http://bennedich.github.io/web-playground/'>demos</a>.
